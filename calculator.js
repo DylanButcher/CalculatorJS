@@ -100,23 +100,56 @@ const currentOperandTextElement = document.querySelector('[data-currentOperand]'
 
 const calculator = new Calculator(previousOperandTextElement, currentOperandTextElement)
 
+const numberKeys =[ "0", "1", "2","3","4","5","6","7","8","9"];
+const operationKeys = ["+", "-", "*", "/"];
+const equalKeys = ["=", "Enter"];
+const deleteKeys = ["Backspace", "Delete"];
+
+const validKeys =[...numberKeys, ...operationKeys ,...equalKeys, ...deleteKeys];
+
+document.body.addEventListener("keydown", function(e){
+    // only process the key down event if its a valid key
+    if(e.key && validKeys.includes(e.key)){
+       keyEntry(e.key)
+    }
+});
+
+function keyEntry(key){
+    let failedOperation = false;
+    // process the key click
+    if( numberKeys.includes(key)){
+        calculator.appendNumber(key);
+    }else if(operationKeys.includes(key)){
+        calculator.chooseOperation(key);
+    } else if(deleteKeys.includes(key)) {
+        calculator.delete();
+    } else if(equalKeys.includes(key)) {
+        calculator.compute();
+    }else {
+        failedOperation = true;
+    }
+    // only update display if operation has been done
+    if(!failedOperation){
+        calculator.updateDisplay();
+    }else {
+        console.error("Error processing key event");
+    }
+}
+
 numberButtons.forEach(button => {
     button.addEventListener('click', () => {
-        calculator.appendNumber(button.innerText)
-        calculator.updateDisplay()
+        keyEntry(button.innerText)
     })
 })
 
 operationButtons.forEach(button => {
     button.addEventListener('click', () => {
-        calculator.chooseOperation(button.innerText)
-        calculator.updateDisplay()
+        keyEntry(button.innerText)
     })
 })
 
 equalsButton.addEventListener('click', button => {
-    calculator.compute()
-    calculator.updateDisplay()
+    keyEntry("Enter")
 })
 
 allClearButton.addEventListener('click', button => {
@@ -125,6 +158,5 @@ allClearButton.addEventListener('click', button => {
 })
 
 deleteButton.addEventListener('click', button => {
-    calculator.delete()
-    calculator.updateDisplay()
+    keyEntry("Delete")
 })
